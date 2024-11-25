@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-function App() {
+function NameForm() {
   const [name, setName] = useState('');
 
   const handleSubmit = async (event) => {
@@ -29,10 +29,10 @@ function App() {
             required 
           />
         </div>
-        <button type="submit" className="btn btn-primary">Cadastrar</button>
+        <button type="submit" className="btn btn-primary">Cadastrar Nome</button>
       </form>
     </div>
   );
 }
 
-export default App;
+export default NameForm;
