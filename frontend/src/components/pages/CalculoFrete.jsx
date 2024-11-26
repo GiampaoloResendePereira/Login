@@ -13,45 +13,44 @@ function CalculoFrete() {
   const [error, setError] = useState('');
   const [valorFrete, setValorFrete] = useState(0);
   const [distancia, setDistancia] = useState(0);
+  const [tempoDeslocamento, setTempoDeslocamento] = useState(0); // Adicionando tempo de deslocamento
   const [showModal, setShowModal] = useState(false);
-  const [freteId, setFreteId] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
+      console.log('Dados enviados:', { cepOrigem, cepDestino, peso, largura, altura, comprimento });
       const response = await axios.post('http://localhost:5000/api/calcularfrete', {
         cepOrigem,
         cepDestino,
-        peso
+        peso,
+        largura,
+        altura,
+        comprimento
       });
 
-      const valorFrete = Number(response.data.valorFrete);
-      const distancia = Number(response.data.distancia);
-      const idFrete = response.data.idFrete;  // ID do frete salvo no banco
+      console.log('Resposta recebida:', response.data);
 
-      if (isNaN(valorFrete) || isNaN(distancia)) {
+      const valorFrete = parseFloat(response.data.valorFrete);
+      const distancia = parseFloat(response.data.distancia);
+      const tempoDeslocamento = parseFloat(response.data.tempoDeslocamento);
+
+      if (isNaN(valorFrete) || isNaN(distancia) || isNaN(tempoDeslocamento)) {
         throw new Error('Erro ao calcular o frete');
       }
 
       setValorFrete(valorFrete);
       setDistancia(distancia);
-      setFreteId(idFrete);
+      setTempoDeslocamento(tempoDeslocamento);
       setShowModal(true);
+      setError(''); // Limpar erro se o cálculo for bem-sucedido
     } catch (err) {
+      console.error('Erro ao calcular frete:', err);
       setError('Erro ao calcular o frete. Por favor, verifique os dados e tente novamente.');
     }
     setLoading(false);
-  };
-
-  const handleRequestFrete = async () => {
-    try {
-      const response = await axios.get(`http://localhost:5000/api/solicitarfrete/${freteId}`);
-      alert(`Frete solicitado com sucesso! Detalhes: ${JSON.stringify(response.data)}`);
-    } catch (err) {
-      alert('Erro ao solicitar o frete.');
-    }
   };
 
   const handleCancel = () => {
@@ -152,12 +151,12 @@ function CalculoFrete() {
                 <button type="button" className="btn-close" onClick={handleCancel}></button>
               </div>
               <div className="modal-body">
-                <p><strong>Valor do frete:</strong> R$ {Number(valorFrete).toFixed(2)}</p>
-                <p><strong>Distância:</strong> {Number(distancia).toFixed(2)} km</p>
+                <p><strong>Valor do frete:</strong> R$ {valorFrete.toFixed(2)}</p>
+                <p><strong>Distância:</strong> {distancia.toFixed(2)} km</p>
+                <p><strong>Tempo de Deslocamento:</strong> {tempoDeslocamento} minutos</p>
               </div>
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={handleCancel}>Cancelar</button>
-                <button className="btn btn-primary" onClick={handleRequestFrete}>Solicitar Frete</button>
               </div>
             </div>
           </div>

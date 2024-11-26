@@ -2,8 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../../assets/img/logo.png';
 import React from 'react';
 import { Navbar, Container, Nav } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom'; // Adicionando Link para navegação
-import GerenciamentoEntrega from '..TabelaEntrega/Gerenciamentoentrega';
+import { useNavigate } from 'react-router-dom'; // Adicionando Link para navegação
+import GerenciamentoEntrega from '../TabelaEntrega/Gerenciamentoentrega';
 
 
 function TelaAdministrador () {

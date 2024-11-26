@@ -22,7 +22,7 @@ function App() {
       <Router>
         <Routes>
           {/* Rotas */}
-          <Route path="/" element={<UserForm />} />
+          <Route path="/user" element={<UserForm />} />
           <Route path="/name" element={<NameForm />} />
           <Route path="/tabela" element={<TabelaForm />} />  
           <Route path="/editar" element={<EditNameForm />} />   
