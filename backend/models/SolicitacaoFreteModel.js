@@ -1,76 +1,39 @@
 const db = require('../db');
 
-/**
- * Salvar uma nova solicitação de frete no banco de dados.
- * @param {Object} solicitacao - Dados da solicitação.
- * @param {Function} callback - Função de callback para tratar o resultado.
- */
-const salvarSolicitacaoFrete = (solicitacao, callback) => {
-  const {
-    nomeRemetente,
-    telefoneRemetente,
-    emailRemetente,
-    cepRemetente,
-    nomeDestinatario,
-    telefoneDestinatario,
-    emailDestinatario,
-    cepDestinatario,
-    freteId,
-  } = solicitacao;
-
-  const sql = `
+// Função para salvar uma solicitação de frete
+const salvarSolicitacao = (solicitacao, callback) => {
+  const query = `
     INSERT INTO solicitacao_frete 
-    (nome_remetente, telefone_remetente, email_remetente, cep_remetente, 
-    nome_destinatario, telefone_destinatario, email_destinatario, cep_destinatario, frete_id) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (nome_remetente, telefone_remetente, email_remetente, cep_remetente,
+      nome_destinatario, telefone_destinatario, email_destinatario, cep_destinatario)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
-
-  db.query(
-    sql,
-    [
-      nomeRemetente,
-      telefoneRemetente,
-      emailRemetente,
-      cepRemetente,
-      nomeDestinatario,
-      telefoneDestinatario,
-      emailDestinatario,
-      cepDestinatario,
-      freteId,
-    ],
-    (err, result) => {
-      if (err) {
-        console.error('Erro ao salvar solicitação de frete:', err.message);
-        return callback(err, null);
-      }
-      return callback(null, { id: result.insertId, ...solicitacao });
-    }
-  );
+  
+  pool.query(query, [
+    solicitacao.nome_remetente,
+    solicitacao.telefone_remetente,
+    solicitacao.email_remetente,
+    solicitacao.cep_remetente,
+    solicitacao.nome_destinatario,
+    solicitacao.telefone_destinatario,
+    solicitacao.email_destinatario,
+    solicitacao.cep_destinatario
+  ], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results.insertId);  // Retorna o ID da solicitação criada
+  });
 };
 
-/**
- * Obter uma solicitação de frete pelo ID.
- * @param {number} solicitacaoId - ID da solicitação.
- * @param {Function} callback - Função de callback para tratar o resultado.
- */
-const obterSolicitacaoFretePorId = (solicitacaoId, callback) => {
-  const sql = 'SELECT * FROM solicitacao_frete WHERE id = ?';
-
-  db.query(sql, [solicitacaoId], (err, results) => {
-    if (err) {
-      console.error('Erro ao buscar solicitação de frete:', err.message);
-      return callback(err, null);
-    }
-
-    if (results.length > 0) {
-      return callback(null, results[0]);
-    } else {
-      return callback(new Error('Solicitação de frete não encontrada'), null);
-    }
+// Função para obter a solicitação de frete por ID
+const obterSolicitacaoPorId = (id, callback) => {
+  const query = 'SELECT * FROM solicitacao_frete WHERE id = ?';
+  pool.query(query, [id], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results[0]);  // Retorna os dados da solicitação
   });
 };
 
 module.exports = {
-  salvarSolicitacaoFrete,
-  obterSolicitacaoFretePorId,
+  salvarSolicitacao,
+  obterSolicitacaoPorId
 };

@@ -5,7 +5,7 @@ const { salvarSolicitacaoFrete, obterSolicitacaoFretePorId } = require('../model
  * @param {Object} req - Objeto de requisição do Express.
  * @param {Object} res - Objeto de resposta do Express.
  */
-const salvarSolicitacao = (req, res) => {
+const salvarSolicitacao = async (req, res) => {
   const { remetente, destinatario, freteId } = req.body;
 
   // Validação básica dos dados
@@ -13,6 +13,7 @@ const salvarSolicitacao = (req, res) => {
     return res.status(400).json({ error: 'Dados insuficientes para criar uma solicitação' });
   }
 
+  // Construção do objeto de solicitação
   const solicitacao = {
     nomeRemetente: remetente.nome,
     telefoneRemetente: remetente.telefone,
@@ -25,13 +26,14 @@ const salvarSolicitacao = (req, res) => {
     freteId,
   };
 
-  salvarSolicitacaoFrete(solicitacao, (err, solicitacaoSalva) => {
-    if (err) {
-      console.error('Erro ao salvar solicitação:', err.message);
-      return res.status(500).json({ error: 'Erro ao salvar solicitação de frete' });
-    }
+  try {
+    // Salvar a solicitação de frete
+    const solicitacaoSalva = await salvarSolicitacaoFrete(solicitacao);
     return res.status(201).json({ message: 'Solicitação salva com sucesso', data: solicitacaoSalva });
-  });
+  } catch (err) {
+    console.error('Erro ao salvar solicitação:', err.message);
+    return res.status(500).json({ error: 'Erro ao salvar solicitação de frete' });
+  }
 };
 
 /**
@@ -39,7 +41,7 @@ const salvarSolicitacao = (req, res) => {
  * @param {Object} req - Objeto de requisição do Express.
  * @param {Object} res - Objeto de resposta do Express.
  */
-const obterSolicitacao = (req, res) => {
+const obterSolicitacao = async (req, res) => {
   const solicitacaoId = parseInt(req.params.id, 10);
 
   // Verificar se o ID é válido
@@ -47,13 +49,17 @@ const obterSolicitacao = (req, res) => {
     return res.status(400).json({ error: 'ID inválido fornecido' });
   }
 
-  obterSolicitacaoFretePorId(solicitacaoId, (err, solicitacao) => {
-    if (err) {
-      console.error('Erro ao buscar solicitação:', err.message);
+  try {
+    // Obter a solicitação de frete pelo ID
+    const solicitacao = await obterSolicitacaoFretePorId(solicitacaoId);
+    if (!solicitacao) {
       return res.status(404).json({ error: 'Solicitação de frete não encontrada' });
     }
     return res.json(solicitacao);
-  });
+  } catch (err) {
+    console.error('Erro ao buscar solicitação:', err.message);
+    return res.status(500).json({ error: 'Erro ao buscar solicitação de frete' });
+  }
 };
 
 module.exports = {
