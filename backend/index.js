@@ -47,7 +47,8 @@ app.get('/api/solicitacaofrete/:id', obterSolicitacao); // Obter detalhes da sol
 
 //page
 app.post('/api/calcularfrete', calcularFrete);
-
+app.get('/api/fretes', fetchFretes);
+app.put('/api/fretes/:id', editFrete);
 
 //TabelaEntrega
 app.get('/api/pedidos', listarPedidos); // Listar todos os pedidos

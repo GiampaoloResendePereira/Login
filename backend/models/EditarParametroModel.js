@@ -11,8 +11,8 @@ const getFretes = (callback) => {
 };
 
 const updateFrete = (id, frete, callback) => {
-  const sql = 'UPDATE parametro_frete SET menos_1kg = ?, entre_1kge3kg = ?, entre_3kge8kg = ?, entre_8kge12kg = ?, acima_12kg = ?, km_rodado = ? WHERE id = ?';
-  db.query(sql, [frete.menos_1kg, frete.entre_1kge3kg, frete.entre_3kge8kg, frete.entre_8kge12kg, frete.acima_12kg, frete.km_rodado, id], (err, result) => {
+  const sql = 'UPDATE parametro_frete SET menos_1kg = ?, entre_1kge3kg = ?, entre_3kge8kg = ?, entre_8kge12kg = ?, acima_12kg = ?, km_rodado = ?, tempo_deslocamento = ? WHERE id = ?';
+  db.query(sql, [frete.menos_1kg, frete.entre_1kge3kg, frete.entre_3kge8kg, frete.entre_8kge12kg, frete.acima_12kg, frete.km_rodado, frete.tempo_deslocamento, id], (err, result) => {
     if (err) {
       return callback(err, null);
     }

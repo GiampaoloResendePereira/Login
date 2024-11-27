@@ -67,7 +67,7 @@ const calcularFrete = (req, res) => {
           }
 
           const custoKm = parseFloat(parametros.km_rodado);
-          const custoDeslocamento = tempoDeslocamento * 0.30;
+          const custoDeslocamento = parseFloat(parametros.tempo_deslocamento);
 
           const valorTotalFrete = parseFloat((valorFrete + (distancia * custoKm) + custoDeslocamento).toFixed(2));
 
