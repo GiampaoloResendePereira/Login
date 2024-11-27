@@ -2,8 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../../assets/img/logo.png';
 import React from 'react';
 import { Navbar, Container, Nav } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom'; // Adicionando Link para navegação
-import SolicitacaoFrete from '../Formularios/SolicitacaoFrete';
+import {  useNavigate } from 'react-router-dom'; // Adicionando Link para navegação
+import CalculoFrete from '../pages/CalculoFrete';
 
 function TelaCliente() {
   const navigate = useNavigate(); // Hook para navegação entre as rotas
@@ -23,12 +23,11 @@ function TelaCliente() {
       {/* Barra de navegação principal */}
       <Navbar bg="dark" variant="dark">
         <Container>
-          <Link className="navbar-brand" to="/">
+          
             <img src={logo} alt="Logo" height="50" />
-          </Link>
+          
           <Nav className="me-auto">
-            <Nav.Link href="/cliente">Solicitação Frete</Nav.Link>
-            <Nav.Link href="/calculo-frete">Calculo Frete</Nav.Link>
+          <Nav.Link href="/calculo-frete">Calculo Frete</Nav.Link>
           </Nav>
           <div className="d-flex align-items-center text-white">
             <button className="btn btn-secondary" onClick={handleLoginLogout}>
@@ -39,7 +38,7 @@ function TelaCliente() {
       </Navbar>
 
       {/* Exibição da página CalculoFrete */}
-      <SolicitacaoFrete />
+      <CalculoFrete />
     </div>
   );
 }
