@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function EditarParametro() {
@@ -12,27 +13,35 @@ function EditarParametro() {
     entre_3kge8kg: '',
     entre_8kge12kg: '',
     acima_12kg: '',
-    km_rodado: ''
+    km_rodado: '',
+    tempo_deslocamento: ''
   });
 
+  const navigate = useNavigate();
+
+  const fetchFretes = async () => {
+    setLoading(true);
+    setErro('');
+    try {
+      console.log('fetchFretes: Iniciando busca dos fretes...');
+      const response = await axios.get('http://localhost:5000/api/fretes');
+      console.log('fetchFretes: Resposta recebida:', response.data);
+      setFretes(response.data[0]);
+      setNovoFrete(response.data[0]); // Carregar valores atuais para edição
+    } catch (err) {
+      console.error('fetchFretes: Erro ao carregar os fretes:', err);
+      setErro('Erro ao carregar os fretes');
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchFretes = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get('http://localhost:5000/api/fretes');
-        setFretes(response.data[0]);
-        setNovoFrete(response.data[0]); // Carregar valores atuais para edição
-      } catch (err) {
-        setErro('Erro ao carregar os fretes');
-      }
-      setLoading(false);
-    };
     fetchFretes();
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (parseFloat(value) >= 0) { // Verificar se o valor não é negativo
+    if (parseFloat(value) >= 0 || value === '') { // Verificar se o valor não é negativo
       setNovoFrete({ ...novoFrete, [name]: value });
     } else {
       alert('Por favor, insira um valor não negativo.');
@@ -50,8 +59,20 @@ function EditarParametro() {
     setLoading(false);
   };
 
-  const cancelarEdicao = () => {
-    setNovoFrete(fretes);
+  const limparCampos = () => {
+    setNovoFrete({
+      ...novoFrete,
+      menos_1kg: '',
+      entre_1kge3kg: '',
+      entre_3kge8kg: '',
+      entre_8kge12kg: '',
+      km_rodado: '',
+      tempo_deslocamento: ''
+    });
+  };
+
+  const handleVoltar = () => {
+    navigate(-1); // Navega para a página anterior
   };
 
   return (
@@ -133,14 +154,32 @@ function EditarParametro() {
             min="0"
           />
         </div>
+        <div className="mb-3">
+          <label className="form-label">Tempo Deslocamento (R$):</label>
+          <input
+            type="number"
+            step="0.01"
+            className="form-control"
+            name="tempo_deslocamento"
+            value={novoFrete.tempo_deslocamento}
+            onChange={handleChange}
+            min="0"
+          />
+        </div>
       </div>
 
       <div className="d-flex justify-content-between">
         <button onClick={salvarAlteracoes} className="btn btn-danger" disabled={loading}>
           {loading ? 'Salvando...' : 'Salvar'}
         </button>
-        <button onClick={cancelarEdicao} className="btn btn-secondary" disabled={loading}>
-          Cancelar
+        <button onClick={limparCampos} className="btn btn-secondary" disabled={loading}>
+          Limpar Campos
+        </button>
+        <button onClick={fetchFretes} className="btn btn-danger" disabled={loading}>
+          Atualizar
+        </button>
+        <button onClick={handleVoltar} className="btn btn-secondary">
+          Voltar
         </button>
       </div>
     </div>

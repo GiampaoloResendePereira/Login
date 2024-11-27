@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Importando useNavigate para redirecionamento
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function CalculoFrete() {
@@ -13,13 +14,29 @@ function CalculoFrete() {
   const [error, setError] = useState('');
   const [valorFrete, setValorFrete] = useState(0);
   const [distancia, setDistancia] = useState(0);
-  const [tempoDeslocamento, setTempoDeslocamento] = useState(0); // Adicionando tempo de deslocamento
+  const [tempoDeslocamento, setTempoDeslocamento] = useState(0);
   const [showModal, setShowModal] = useState(false);
+
+  const navigate = useNavigate(); // Usando useNavigate para redirecionamento
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Validações
+    if (peso <= 0 || peso > 12) {
+      setError('O peso deve ser maior que 0 e até 12kg.');
+      setLoading(false);
+      return;
+    }
+
+    if (largura <= 0 || largura > 50 || altura <= 0 || altura > 50 || comprimento <= 0 || comprimento > 50) {
+      setError('As dimensões (largura, altura e comprimento) devem ser maiores que 0 e até 50cm.');
+      setLoading(false);
+      return;
+    }
+
     try {
       console.log('Dados enviados:', { cepOrigem, cepDestino, peso, largura, altura, comprimento });
       const response = await axios.post('http://localhost:5000/api/calcularfrete', {
@@ -45,16 +62,21 @@ function CalculoFrete() {
       setDistancia(distancia);
       setTempoDeslocamento(tempoDeslocamento);
       setShowModal(true);
-      setError(''); // Limpar erro se o cálculo for bem-sucedido
     } catch (err) {
       console.error('Erro ao calcular frete:', err);
       setError('Erro ao calcular o frete. Por favor, verifique os dados e tente novamente.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleCancel = () => {
     setShowModal(false);
+  };
+
+  const handleSolicitarFrete = () => {
+    setShowModal(false);
+    navigate('/solicitacao-frete');
   };
 
   return (
@@ -157,6 +179,7 @@ function CalculoFrete() {
               </div>
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={handleCancel}>Cancelar</button>
+                <button className="btn btn-danger" onClick={handleSolicitarFrete}>Solicitar Frete</button>
               </div>
             </div>
           </div>
