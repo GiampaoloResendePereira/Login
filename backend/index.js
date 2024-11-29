@@ -19,10 +19,8 @@ const { salvarSolicitacao, obterSolicitacao } = require('./controllers/Solicitac
 const { calcularFrete } = require('./controllers/CalculoFreteController');
 const { fetchFretes, editFrete } = require('./controllers/EditarParametroController');
 
-//TabelaEntrega
-const { listarPedidos, alterarStatusPedido, exibirDetalhesPedido } = require('./controllers/GerenciamentoEntregasController');
-
-
+//Pedidos
+const { fetchPedidos, removePedido } = require('./controllers/GerenciamentoEntregasController');
 
 const app = express();
 
@@ -50,11 +48,9 @@ app.post('/api/calcularfrete', calcularFrete);
 app.get('/api/fretes', fetchFretes);
 app.put('/api/fretes/:id', editFrete);
 
-//TabelaEntrega
-app.get('/api/pedidos', listarPedidos); // Listar todos os pedidos
-app.patch('/api/pedidos/:id', alterarStatusPedido); // Alterar status de um pedido específico
-app.get('/api/pedidos/:id', exibirDetalhesPedido); // Exibir detalhes de um pedido específico
-
+//Pedidos
+app.get('/api/pedidos', fetchPedidos); // Rota para obter os pedidos
+app.delete('/api/pedidos/:id', removePedido); // Rota para deletar um pedido
 
 // Configuração do servidor
 app.listen(5000, () => {

@@ -1,39 +1,29 @@
-const { obterPedidos, atualizarStatusPedido, obterDetalhesPedido } = require('../models/GerenciamentoEntregasModel');
+const { getPedidos, deletePedido } = require('../models/GerenciamentoEntregasModel');
 
-const listarPedidos = (req, res) => {
-  obterPedidos((err, pedidos) => {
+const fetchPedidos = (req, res) => {
+  console.log('fetchPedidos: Iniciando busca dos pedidos...');
+  getPedidos((err, results) => {
     if (err) {
-      return res.status(500).json({ error: 'Erro ao obter pedidos' });
+      console.error('Erro ao buscar os pedidos:', err);
+      return res.status(500).json({ error: 'Erro ao buscar os pedidos', details: err });
     }
-    res.json(pedidos);
+    console.log('fetchPedidos: Pedidos obtidos com sucesso!', results);
+    return res.json(results);
   });
 };
 
-const alterarStatusPedido = (req, res) => {
+const removePedido = (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
-
-  atualizarStatusPedido(id, status, (err, result) => {
+  deletePedido(id, (err, result) => {
     if (err) {
-      return res.status(500).json({ error: 'Erro ao atualizar status do pedido' });
+      console.error('Erro ao deletar o pedido:', err);
+      return res.status(500).json({ error: 'Erro ao deletar o pedido', details: err });
     }
-    res.json({ message: 'Status atualizado com sucesso' });
-  });
-};
-
-const exibirDetalhesPedido = (req, res) => {
-  const { id } = req.params;
-
-  obterDetalhesPedido(id, (err, pedido) => {
-    if (err) {
-      return res.status(500).json({ error: 'Erro ao obter detalhes do pedido' });
-    }
-    res.json(pedido);
+    return res.send('Pedido deletado com sucesso!');
   });
 };
 
 module.exports = {
-  listarPedidos,
-  alterarStatusPedido,
-  exibirDetalhesPedido
+  fetchPedidos,
+  removePedido
 };
