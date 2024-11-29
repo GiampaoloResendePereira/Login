@@ -27,7 +27,7 @@ function TelaCliente() {
             <img src={logo} alt="Logo" height="50" />
           
           <Nav className="me-auto">
-          <Nav.Link href="/calculo-frete">Calculo Frete</Nav.Link>
+          
           </Nav>
           <div className="d-flex align-items-center text-white">
             <button className="btn btn-secondary" onClick={handleLoginLogout}>

@@ -29,6 +29,14 @@ const Login = () => {
     }
   };
 
+  const handleCadastro = () => {
+    navigate('/cadastro-cliente'); // Redireciona para a tela de cadastro de cliente
+  };
+
+  const handleRecuperacaoSenha = () => {
+    navigate('/recuperacao-senha'); // Redireciona para a tela de recuperação de senha
+  };
+
   return (
     <div
       style={{
@@ -97,10 +105,10 @@ const Login = () => {
           <button type="submit" className="btn btn-danger" style={{ padding: '10px', marginTop: '10px' }}>
             Entrar
           </button>
-          <button type="button" className="btn btn-secondary" style={{ padding: '10px' }}>
+          <button type="button" className="btn btn-secondary" style={{ padding: '10px' }} onClick={handleCadastro}>
             Cadastrar
           </button>
-          <button type="button" className="btn btn-link" style={{ marginTop: '10px', color: 'black', textDecoration: 'none' }}>
+          <button type="button" className="btn btn-link" style={{ marginTop: '10px', color: 'black', textDecoration: 'none' }} onClick={handleRecuperacaoSenha}>
             Esqueceu a senha?
           </button>
         </form>

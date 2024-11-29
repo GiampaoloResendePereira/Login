@@ -17,15 +17,16 @@ function SolicitacaoFrete() {
     endereco: { cep: '', bairro: '', cidade: '', estado: '' }
   });
 
-  const [frete, setFrete] = useState(null);
   const [erroCEP, setErroCEP] = useState('');
+  const [erroSolicitacao, setErroSolicitacao] = useState('');
+  const [erroCampos, setErroCampos] = useState('');
 
   const buscarEndereco = async (cep, tipo) => {
     try {
       const resposta = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
       if (resposta.data && !resposta.data.erro) {
         const endereco = resposta.data;
-        const atualizaEndereco = prevState => ({
+        const atualizaEndereco = (prevState) => ({
           ...prevState,
           endereco: {
             ...prevState.endereco,
@@ -59,11 +60,39 @@ function SolicitacaoFrete() {
   }, [destinatario.endereco.cep]);
 
   const handleSalvarSolicitacao = async () => {
+    // Validações dos campos obrigatórios
+    if (!remetente.nome || !remetente.telefone || !remetente.email || !remetente.endereco.cep || !destinatario.nome || !destinatario.telefone || !destinatario.email || !destinatario.endereco.cep) {
+      setErroCampos('Todos os campos são obrigatórios.');
+      return;
+    }
+
     try {
-      const resposta = await axios.post('/api/solicitarfrete', { remetente, destinatario });
-      setFrete(resposta.data.valor);
+      const resposta = await axios.post('http://localhost:5000/api/solicitarfrete', { remetente, destinatario });
+      alert('Solicitação de frete salva com sucesso!');
     } catch (error) {
       console.error('Erro ao salvar solicitação:', error);
+      setErroSolicitacao(error.response.data.error || 'Erro ao salvar solicitação de frete.');
+    }
+  };
+
+  const handleCepChange = (e, tipo) => {
+    const valor = e.target.value;
+    if (/^\d*$/.test(valor)) { // Apenas números
+      tipo === 'remetente' ? setRemetente({ ...remetente, endereco: { ...remetente.endereco, cep: valor } }) : setDestinatario({ ...destinatario, endereco: { ...destinatario.endereco, cep: valor } });
+    }
+  };
+
+  const handleTelefoneChange = (e, tipo) => {
+    const valor = e.target.value;
+    if (/^\d*$/.test(valor)) { // Apenas números
+      tipo === 'remetente' ? setRemetente({ ...remetente, telefone: valor }) : setDestinatario({ ...destinatario, telefone: valor });
+    }
+  };
+
+  const handleNomeChange = (e, tipo) => {
+    const valor = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(valor)) { // Apenas letras
+      tipo === 'remetente' ? setRemetente({ ...remetente, nome: valor }) : setDestinatario({ ...destinatario, nome: valor });
     }
   };
 
@@ -82,32 +111,28 @@ function SolicitacaoFrete() {
   return (
     <div className="container bg-light p-5">
       <h3 className="bg-dark text-white rounded p-3 mb-4">Dados do Remetente</h3>
-      {criarInput('Nome:', remetente.nome, (e) => setRemetente({ ...remetente, nome: e.target.value }))}
-      {criarInput('Telefone:', remetente.telefone, (e) => setRemetente({ ...remetente, telefone: e.target.value }))}
+      {criarInput('Nome:', remetente.nome, (e) => handleNomeChange(e, 'remetente'))}
+      {criarInput('Telefone:', remetente.telefone, (e) => handleTelefoneChange(e, 'remetente'))}
       {criarInput('E-mail:', remetente.email, (e) => setRemetente({ ...remetente, email: e.target.value }))}
-      {criarInput('CEP:', remetente.endereco.cep, (e) => setRemetente({ ...remetente, endereco: { ...remetente.endereco, cep: e.target.value } }))}
+      {criarInput('CEP:', remetente.endereco.cep, (e) => handleCepChange(e, 'remetente'))}
       {criarInput('Bairro:', remetente.endereco.bairro, null, true)}
       {criarInput('Cidade:', remetente.endereco.cidade, null, true)}
       {criarInput('Estado:', remetente.endereco.estado, null, true)}
       {erroCEP && <div className="text-danger">{erroCEP}</div>}
 
       <h3 className="bg-dark text-white rounded p-3 mb-4">Dados do Destinatário</h3>
-      {criarInput('Nome:', destinatario.nome, (e) => setDestinatario({ ...destinatario, nome: e.target.value }))}
-      {criarInput('Telefone:', destinatario.telefone, (e) => setDestinatario({ ...destinatario, telefone: e.target.value }))}
+      {criarInput('Nome:', destinatario.nome, (e) => handleNomeChange(e, 'destinatario'))}
+      {criarInput('Telefone:', destinatario.telefone, (e) => handleTelefoneChange(e, 'destinatario'))}
       {criarInput('E-mail:', destinatario.email, (e) => setDestinatario({ ...destinatario, email: e.target.value }))}
-      {criarInput('CEP:', destinatario.endereco.cep, (e) => setDestinatario({ ...destinatario, endereco: { ...destinatario.endereco, cep: e.target.value } }))}
+      {criarInput('CEP:', destinatario.endereco.cep, (e) => handleCepChange(e, 'destinatario'))}
       {criarInput('Bairro:', destinatario.endereco.bairro, null, true)}
       {criarInput('Cidade:', destinatario.endereco.cidade, null, true)}
       {criarInput('Estado:', destinatario.endereco.estado, null, true)}
       {erroCEP && <div className="text-danger">{erroCEP}</div>}
+      {erroCampos && <div className="text-danger">{erroCampos}</div>}
+      {erroSolicitacao && <div className="text-danger">{erroSolicitacao}</div>}
 
-      {frete !== null && (
-        <div className="mb-3">
-          <h4 className="bg-dark text-white rounded p-3 mb-4">Preço do Frete: R$ {frete}</h4>
-        </div>
-      )}
-
-      <button onClick={handleSalvarSolicitacao} className="btn btn-success mt-4">
+      <button onClick={handleSalvarSolicitacao} className="btn btn-danger mt-4">
         Confirmar e Solicitar Frete
       </button>
     </div>
